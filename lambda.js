@@ -47,8 +47,8 @@
   const fizzBuzzOne = n => (
     (m3 => m5 =>
      if_(and_(m3)(m5))
-     ("FizzBuzz")
-     (if_(m3)("Fizz")(if_(m5)("Buzz")(n))))
+        ("FizzBuzz")
+        (if_(m3)("Fizz")(if_(m5)("Buzz")(n))))
     (zerop(mod(n)(three_)))
     (zerop(mod(n)(five_))));
   const fizzBuzz = n => Y(
