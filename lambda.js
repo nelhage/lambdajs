@@ -29,9 +29,6 @@
   const less_eq = a => b => zerop(sub(a)(b));
   const less    = a => b => zerop(sub(inc(a))(b));
 
-  const js2church = n => (n === 0) ? zero_ : inc(js2church(n-1));
-  const church2js = n => n(x => x + 1)(0);
-
   const Y = f => ((g => f(x => g(g)(x)))
                   (g => f(x => g(g)(x))));
 
@@ -51,14 +48,25 @@
         (if_(m3)("Fizz")(if_(m5)("Buzz")(n))))
     (zerop(mod(n)(three_)))
     (zerop(mod(n)(five_))));
+
   const fizzBuzz = n => Y(
     iter => i =>
       if_(less(n)(i))(
         _ => cons(false_)(false_)
       )(
-        _ => cons(true_)(cons(fizzBuzzOne(i))(iter(inc(i))))
+        _ => cons(true_)(cons(
+          (m3 => m5 =>
+           if_(and_(m3)(m5))
+             ("FizzBuzz")
+             (if_(m3)("Fizz")(if_(m5)("Buzz")(i))))
+          (zerop(mod(i)(three_)))
+          (zerop(mod(i)(five_)))
+        )(iter(inc(i))))
       )()
   )(one_);
+
+  const js2church = n => (n === 0) ? zero_ : inc(js2church(n-1));
+  const church2js = n => n(x => x + 1)(0);
 
   function test() {
     const assert = require('assert');
