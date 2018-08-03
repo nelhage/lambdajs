@@ -18,7 +18,7 @@
   const inc    = n => f => x => f(n(f)(x));
   const add    = a => b => a(inc)(b);
   const mul    = a => b => a(n => add(n)(b))(zero_);
-  const expt   = a => b => a(b)(zero_);
+  const expt   = a => b => b(a);
 
   const zerop  = n => n(_ => false_)(true_);
 
@@ -78,6 +78,9 @@
     assert.strictEqual(6, church2js(fact(js2church(3))));
     assert.strictEqual(2, church2js(mod(js2church(5))(js2church(3))));
     assert.strictEqual(2, church2js(mod(js2church(50))(js2church(6))));
+    assert.strictEqual(8, church2js(expt(js2church(2))(js2church(3))));
+    assert.strictEqual(27, church2js(expt(js2church(3))(js2church(3))));
+    assert.strictEqual(32, church2js(expt(js2church(2))(js2church(5))));
 
     assert.strictEqual(1, church2js(fizzBuzzOne(js2church(1))));
     assert.strictEqual(2, church2js(fizzBuzzOne(js2church(2))));
