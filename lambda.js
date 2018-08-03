@@ -54,9 +54,9 @@
   const fizzBuzz = n => Y(
     iter => i =>
       if_(less(n)(i))(
-        _ => cons(cons(false_)(zero_))(false_)
+        _ => cons(false_)(false_)
       )(
-        _ => cons(cons(true_)(fizzBuzzOne(i)))(iter(inc(i)))
+        _ => cons(true_)(cons(fizzBuzzOne(i))(iter(inc(i))))
       )()
   )(one_);
 
@@ -84,13 +84,13 @@
     assert.strictEqual(false, less(js2church(15))(js2church(15))(true)(false));
 
     let fb = fizzBuzz(js2church(100));
-    while(car(car(fb))(true)(false)) {
-      let elem = cdr(car(fb));
+    while(car(fb)(true)(false)) {
+      let elem = car(cdr(fb));
       if (typeof(elem) !== 'string') {
         elem = church2js(elem);
       }
       console.log(elem);
-      fb = cdr(fb);
+      fb = cdr(cdr(fb));
     }
   }
 
