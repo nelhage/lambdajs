@@ -412,7 +412,7 @@ const fact1 = fact_(fact_);
 - What we want to write is
 
 ```js
-const fact = Magic(fact_ => n => (
+const fact = Recursify(fact_ => n => (
   if_(zerop(n))
      (_ => one)
      (_ => mul(n)(fact_(dec(n))))()));
@@ -449,10 +449,10 @@ fact_ => n => (
 
 # Types
 
-- What is the type of `Magic`?
+- What is the type of `Recursify`?
 
 ```js
-const fact = Magic(fact_ => n => (
+const fact = Recursify(fact_ => n => (
   if_(zerop(n))
      (_ => one)
      (_ => mul(n)(fact_(dec(n))))()));
@@ -470,3 +470,167 @@ const fact = Magic(fact_ => n => (
 <!-- .element: class="fragment" -->
 - <p>Or in general: `(T → T) → T`</p>
 <!-- .element: class="fragment" -->
+
+---
+
+# Fixed-point combinators
+
+- The thing I've called "`Recursify`" is known as a "fixed-point
+  combinator"
+- Fixed-point combinators are the basis of recursion in the lambda
+  calculus and similar systems.
+
+---
+
+# Implementation
+
+```js
+const Y = f => (g => f(g(g)))
+               (g => f(g(g)));
+```
+
+---
+
+# The Y combinator
+```js
+const Y = f => (g => f(g(g)))
+               (g => f(g(g)));
+Y(f)
+```
+
+<div>
+β ⇒
+
+
+```js
+(g => f(g(g)))
+(g => f(g(g)))
+```
+</div>
+<!-- .element: class="fragment" -->
+
+<div>
+α ⇒
+
+```js
+(h => f(h(h)))
+(g => f(g(g)))
+```
+</div>
+<!-- .element: class="fragment" -->
+
+---
+
+# Continued…
+
+```js
+Y(f) ⇒ (h => f(h(h)))
+        (g => f(g(g)))
+```
+
+<div>
+β ⇒
+
+```js
+f((g => f(g(g)))
+  (g => f(g(g))))
+```
+
+</div>
+<!-- .element: class="fragment" -->
+
+<div>
+But recall:
+
+```js
+Y(f) = (g => f(g(g)))
+       (g => f(g(g)))
+```
+
+</div>
+<!-- .element: class="fragment" -->
+
+<div>
+∴
+
+```js
+Y(f) = f(Y(f))
+```
+
+</div>
+<!-- .element: class="fragment" -->
+
+---
+
+# Implementation note
+
+```js
+const Y = f => ((g => f(x => g(g)(x)))
+                (g => f(x => g(g)(x))));
+```
+
+Note:
+
+The form on the previous slide is known as the "normal-order Y
+combinator". To make it actually execute in Javascript without
+spinning forever, we need to use the "applicative-order Y combinator".
+
+---
+
+# Factorial
+
+```js
+const fact = Y(fact_ => n => (
+  if_(zerop(n))
+     (_ => one)
+     (_ => mul(n)(fact_(dec(n))))()));
+```
+
+---
+
+```js
+const mod = Y(
+  mod => n => x =>
+   (rem => if_(zerop(rem))(_ => n)(_ => mod(dec(rem))(x))())
+   (sub(inc(n))(x)));
+
+const three  = inc(inc(inc(zero)));
+const five   = inc(inc(three));
+```
+
+---
+
+```js
+const fizzBuzz = n => Y(
+  iter => i =>
+    if_(less(n)(i))(
+      _ => cons(false_)(false_)
+    )(
+      _ => cons(true_)(cons(
+        (m3 => m5 =>
+         if_(and_(m3)(m5))
+           ("FizzBuzz")
+           (if_(m3)("Fizz")(if_(m5)("Buzz")(i))))
+        (zerop(mod(i)(three)))
+        (zerop(mod(i)(five)))
+      )(iter(inc(i))))
+    )()
+)(one);
+```
+
+---
+
+```js
+const js2church = n => (n === 0) ? zero : inc(js2church(n-1));
+const church2js = n => n(x => x + 1)(0);
+
+let fb = fizzBuzz(js2church(100));
+while(car(fb)(true)(false)) {
+  let elem = car(cdr(fb));
+  if (typeof(elem) !== 'string') {
+    elem = church2js(elem);
+  }
+  console.log(elem);
+  fb = cdr(cdr(fb));
+}
+```
