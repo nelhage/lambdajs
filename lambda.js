@@ -34,6 +34,10 @@
     if_(zerop(n))(_ => one)(_ => mul(n)(fact_(fact_)(dec(n))))());
   const fact1 = fact_(fact_);
 
+  /* diverges */
+  const Y_norm = f => (g => f(g(g)))
+                      (g => f(g(g)));
+
   const Y = f => ((g => f(x => g(g)(x)))
                   (g => f(x => g(g)(x))));
 
